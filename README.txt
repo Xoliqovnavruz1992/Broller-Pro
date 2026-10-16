@@ -1,0 +1,10 @@
+Ross 308 - kunlik jadval (PWA)
+
+Fayllar (hammasi bitta papkada turishi kerak):
+  index.html, manifest.webmanifest, sw.js, icon-192.png, icon-512.png, icon-maskable-512.png
+
+Joylash (eng oson yo'l): https://app.netlify.com/drop sahifasiga shu papkani tashlang.
+Berilgan https:// havolani telefonda Chrome'da oching -> menyu -> "Install app" / "Ilovani o'rnatish".
+PWA faqat https:// orqali o'rnatiladi va offline ishlaydi (faylni telefondan to'g'ridan-to'g'ri ochsangiz ishlamaydi).
+
+Yangilash: index.html o'zgarsa, sw.js ichidagi 'ross308-v1' ni 'ross308-v2' ga o'zgartiring.

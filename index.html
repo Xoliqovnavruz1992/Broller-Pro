@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0b6b5c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ross 308">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<title>Ross 308 — kunlik jadval</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Instrument+Sans:wght@400;600&display=swap">
+<style>
+:root{--bg:#eaf0ec;--card:#fff;--ink:#12261f;--mut:#5a6d64;--line:#d3ded8;--std:#d99a00;--act:#0b6b5c;--ok:#1d7a46;--warn:#b86e00;--bad:#c2412d;--chip:#f3f7f5;--onact:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1c17;--card:#17282f;--ink:#e6f0ea;--mut:#9bb0a6;--line:#2a3f38;--std:#f2b705;--act:#4fd1b6;--ok:#58d68d;--warn:#f0a53a;--bad:#ff7a64;--chip:#1b3029;--onact:#06241d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1c17;--card:#17282f;--ink:#e6f0ea;--mut:#9bb0a6;--line:#2a3f38;--std:#f2b705;--act:#4fd1b6;--ok:#58d68d;--warn:#f0a53a;--bad:#ff7a64;--chip:#1b3029;--onact:#06241d;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px);overflow-x:hidden;max-width:100%}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Instrument Sans",system-ui,sans-serif}
+main{max-width:520px;margin:0 auto;padding:16px 16px 40px;display:grid;grid-template-columns:minmax(0,1fr);gap:14px}input[type=date]{min-width:0;-webkit-appearance:none;appearance:none}
+h1,h2{font-family:"Bricolage Grotesque",system-ui,sans-serif;margin:0}
+h1{font-size:22px}h2{font-size:17px;margin-bottom:8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+label{display:block;font-size:13px;color:var(--mut);margin-bottom:4px}
+input{width:100%;font:inherit;color:var(--ink);background:var(--chip);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px}
+input:focus-visible,button:focus-visible,summary:focus-visible,tr[tabindex]:focus-visible{outline:3px solid var(--act);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:end}.row>div{flex:1 1 120px;min-width:0}
+button{font:600 16px "Instrument Sans",system-ui,sans-serif;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--act);background:var(--act);color:var(--onact);cursor:pointer}
+button.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.stepper{display:flex;gap:10px;align-items:center}
+.stepper button{width:52px;padding:0;font-size:24px}
+.stepper .mid{flex:1;text-align:center}
+.big{font:800 64px/0.95 "Bricolage Grotesque",system-ui,sans-serif}
+.big small{font:600 16px "Instrument Sans",system-ui,sans-serif;color:var(--mut);margin-left:4px}
+.date{color:var(--mut);font-size:14px;min-height:21px}
+input[type=range]{padding:0;min-height:32px;accent-color:var(--act);background:transparent;border:0;margin:8px 0 12px}
+.m{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.m:first-of-type{border-top:0}
+.m .k{color:var(--mut);font-size:14px}
+.m .v{text-align:right}
+.m .v b{font:800 28px/1 "Bricolage Grotesque",system-ui,sans-serif}
+.m .v b i{font:600 14px "Instrument Sans",system-ui,sans-serif;color:var(--mut);font-style:normal;margin-left:3px}
+.m .v span{display:block;font-size:13px;color:var(--mut);margin-top:3px}
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;font-weight:600;font-size:14px;background:var(--chip);border:1px solid var(--line)}
+.badge.vac{border-color:var(--act);color:var(--act)}.badge.abx{border-color:var(--warn);color:var(--warn)}
+.sub{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:14px;padding-top:12px;border-top:1px solid var(--line)}
+.sub span{color:var(--mut)}.sub b{float:right}
+.next{margin:12px 0 0;font-size:14px;color:var(--mut)}
+.res{border-radius:10px;padding:12px 14px;background:var(--chip);border-left:6px solid var(--line);margin:12px 0}
+.res b{font:800 22px "Bricolage Grotesque",system-ui,sans-serif}
+.res.ok{border-color:var(--ok)}.res.ok b{color:var(--ok)}
+.res.warn{border-color:var(--warn)}.res.warn b{color:var(--warn)}
+.res.bad{border-color:var(--bad)}.res.bad b{color:var(--bad)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.chips button{background:transparent;color:var(--ink);border-color:var(--line);min-height:40px;padding:0 14px}
+.chips button[aria-pressed=true]{background:var(--act);color:var(--onact);border-color:var(--act)}
+svg{width:100%;height:auto;display:block}
+.leg{display:flex;gap:16px;font-size:13px;color:var(--mut);margin-top:6px}
+.leg i{display:inline-block;width:14px;height:4px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.scroll{overflow:auto;max-height:420px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:8px 6px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{position:sticky;top:0;background:var(--card);font-size:12px;color:var(--mut);font-weight:600}
+td:last-child,th:last-child{text-align:left}
+th:first-child,td:first-child{text-align:left}
+tr[tabindex]{cursor:pointer}tr.sel td{background:var(--chip);font-weight:600}
+details summary{cursor:pointer;font:600 17px "Bricolage Grotesque",system-ui,sans-serif;min-height:44px;display:flex;align-items:center}
+.note{font-size:13px;color:var(--mut);margin:8px 0 0}
+</style>
+</head>
+<body>
+<main>
+<h1>Ross 308 — kunlik jadval</h1>
+
+<section class="card" aria-label="Kunni tanlash">
+  <div class="stepper">
+    <button class="ghost" id="prev" aria-label="Oldingi kun">−</button>
+    <div class="mid"><div class="big"><span id="dayBig">0</span><small>-kun</small></div><div class="date" id="date"></div></div>
+    <button class="ghost" id="next" aria-label="Keyingi kun">+</button>
+  </div>
+  <input id="range" type="range" min="0" max="45" value="0" aria-label="Kun">
+  <div class="row">
+    <div><label for="start">Joylashtirilgan sana</label><input id="start" type="date"></div>
+    <div><label for="birds">Bosh soni</label><input id="birds" type="number" min="0" inputmode="numeric" placeholder="2400"></div>
+    <button class="ghost" id="today">Bugun</button>
+  </div>
+</section>
+
+<section class="card" aria-label="Shu kun me'yori">
+  <h2>Shu kunning me'yori</h2>
+  <div class="m"><span class="k">Tirik vazn</span><div class="v"><b id="vW"></b><span id="sW"></span></div></div>
+  <div class="m"><span class="k">Ozuqa</span><div class="v"><b id="vF"></b><span id="sF"></span></div></div>
+  <div class="m"><span class="k">Suv</span><div class="v"><b id="vA"></b><span id="sA"></span></div></div>
+  <div class="m"><span class="k">Harorat</span><div class="v"><b id="vT"></b></div></div>
+  <div class="m"><span class="k">Veterinariya</span><div class="v"><span class="badge" id="vet"></span></div></div>
+  <div class="sub">
+    <div><span>Kunlik o'sish</span><b id="xG"></b></div>
+    <div><span>Suv / ozuqa</span><b id="xR"></b></div>
+    <div><span>Jami ozuqa (1 bosh)</span><b id="xC"></b></div>
+    <div><span>FCR (jami)</span><b id="xE"></b></div>
+  </div>
+  <p class="next" id="nextVac"></p>
+</section>
+
+<section class="card" aria-label="Kuzatuv">
+  <h2>Sizning podangiz shu kuni</h2>
+  <div class="row">
+    <div><label for="w">O'rtacha vazn (g)</label><input id="w" type="number" min="0" inputmode="decimal"></div>
+    <div><label for="mort">Ulim (bosh)</label><input id="mort" type="number" min="0" inputmode="numeric"></div>
+    <button id="save">Saqlash</button>
+  </div>
+  <div class="res" id="res" role="status" aria-live="polite"></div>
+  <div id="alive" class="note"></div>
+</section>
+
+<section class="card" aria-label="Grafik">
+  <h2>Grafik</h2>
+  <div class="chips" id="chips"></div>
+  <svg id="chart" viewBox="0 0 360 210" role="img" aria-label="Kunlar bo'yicha grafik"></svg>
+  <div class="leg"><span><i style="background:var(--std)"></i>Standart</span><span id="legA"><i style="background:var(--act)"></i>Sizning poda</span></div>
+</section>
+
+<section class="card">
+  <details>
+    <summary>To'liq jadval (0–45 kun)</summary>
+    <div class="scroll"><table>
+      <thead><tr><th>Kun</th><th>Vazn g</th><th>Ozuqa g</th><th>Suv ml</th><th>°C</th><th>Veterinariya</th></tr></thead>
+      <tbody id="body"></tbody>
+    </table></div>
+    <p class="note">Qatorni bossangiz, o'sha kun ochiladi.</p>
+  </details>
+</section>
+</main>
+
+<script>
+const VET=['Shakarli suv (5%)','Vitamin ADE','Vaksina IBK (4/91)+(H12…)','Colifloks (antibiotik)','Vaksina Gambora','Vitamin B kompleks','Vaksina IBK (H120)','Vaksina ND (La-Sota)','Askorbinka','Limon kislota','Toza suv'];
+const D=[[49,13,25,33,0],[56,17,32,33,1],[72,20,39,32,1],[89,23,43,32,1],[109,27,50,31,2],[132,31,57,31,1],[157,35,64,30,3],[185,39,71,29,3],[217,43,80,29,3],[251,48,88,28,1],[289,53,98,28,4],[330,58,105,27,5],[375,63,116,27,5],[422,69,123,27,5],[473,74,136,26,6],[527,80,147,26,1],[585,86,158,26,1],[654,92,168,25,4],[709,98,177,25,5],[775,104,190,25,5],[844,110,201,25,5],[916,116,212,25,7],[990,122,222,24,1],[1066,128,235,24,1],[1200,134,242,24,1],[1315,140,255,24,1],[1410,146,267,23,1],[1520,152,275,23,8],[1600,157,285,23,8],[1710,163,294,23,8],[1825,168,305,22,9],[1925,173,314,22,9],[2030,178,325,22,9],[2120,183,329,22,8],[2230,187,342,22,8],[2335,192,348,22,8],[2450,196,356,21,8],[2560,200,363,21,8],[2664,204,370,21,10],[2780,208,377,21,10],[2895,211,384,21,9],[2995,215,390,21,9],[3055,218,397,20,9],[3165,221,401,20,9],[3290,223,405,20,9],[3400,225,408,19,10]];
+const N=D.length-1,VAC=[2,4,6,7];
+const CUM=[];D.reduce((s,r,i)=>(CUM[i]=s+r[1]),0);
+const MET={w:{n:'Vazn',u:'g',i:0},f:{n:'Ozuqa',u:'g',i:1},a:{n:'Suv',u:'ml',i:2},t:{n:'Harorat',u:'°C',i:3}};
+let st={start:'',birds:'',mort:{},log:{}},day=0,met='w';
+try{const r=localStorage.getItem('ross308v2');if(r)st=Object.assign(st,JSON.parse(r));
+ else{const o=JSON.parse(localStorage.getItem('ross308')||'null');if(o){st.start=o.start||'';(o.log||[]).forEach(x=>st.log[x.d]=x.w)}}}catch(e){}
+const $=s=>document.querySelector(s);
+const save=()=>{try{localStorage.setItem('ross308v2',JSON.stringify(st))}catch(e){}};
+const cls=v=>v<=-7?'bad':v<=-3?'warn':v>=7?'warn':'ok';
+const sign=v=>(v>0?'+':'')+v.toFixed(1)+'%';
+const p2=n=>String(n).padStart(2,'0');
+function dateOf(d){if(!st.start)return '';const t=new Date(st.start+'T00:00:00');t.setDate(t.getDate()+d);return p2(t.getDate())+'.'+p2(t.getMonth()+1)+'.'+t.getFullYear()}
+function curDay(){if(!st.start)return null;const d=Math.floor((Date.now()-new Date(st.start+'T00:00:00').getTime())/864e5);return d>=0?Math.min(d,N):null}
+function alive(d){const b=+st.birds;if(!b)return null;let m=0;for(const k in st.mort)if(+k<=d)m+=+st.mort[k]||0;return Math.max(b-m,0)}
+const kg=n=>n>=100?Math.round(n).toLocaleString('en').replace(/,/g,' '):n.toFixed(1);
+function verdict(v){return v<=-7?'Standartdan ancha past. Yem, suv va haroratni tekshiring.':v<=-3?'Biroz past. Ozuqa iste\'moli va suv bosimiga e\'tibor bering.':v>=7?'Standartdan yuqori. Bir xillikni (uniformity) tekshiring.':'Standart doirasida.'}
+
+function render(fill=true){
+ const r=D[day],al=alive(day);
+ $('#dayBig').textContent=day;$('#range').value=day;$('#date').textContent=dateOf(day);
+ $('#vW').innerHTML=r[0]+'<i>g</i>';
+ $('#sW').textContent=al!==null?'poda: '+kg(r[0]*al/1000)+' kg':'';
+ $('#vF').innerHTML=r[1]+'<i>g / bosh</i>';
+ $('#sF').textContent=al!==null?'poda: '+kg(r[1]*al/1000)+' kg':'bosh sonini kiriting — poda jami chiqadi';
+ $('#vA').innerHTML=r[2]+'<i>ml / bosh</i>';
+ $('#sA').textContent=al!==null?'poda: '+kg(r[2]*al/1000)+' litr':'';
+ $('#vT').innerHTML=r[3]+'<i>°C</i>';
+ const v=r[4],b=$('#vet');b.textContent=VET[v];b.className='badge'+(VAC.includes(v)?' vac':v===3?' abx':'');
+ $('#xG').textContent=day?'+'+(r[0]-D[day-1][0])+' g':'—';
+ $('#xR').textContent=(r[2]/r[1]).toFixed(2);
+ $('#xC').textContent=(CUM[day]/1000).toFixed(2)+' kg';
+ $('#xE').textContent=(CUM[day]/r[0]).toFixed(2);
+ const nv=VAC.map(i=>D.findIndex((x,j)=>j>=day&&x[4]===i)).filter(j=>j>=0).sort((a,b)=>a-b)[0];
+ $('#nextVac').textContent=nv===undefined?'Qolgan emlash yo\'q.':nv===day?'Bugun emlash kuni: '+VET[D[nv][4]]+'.':'Keyingi emlash: '+nv+'-kun ('+dateOf(nv)+(dateOf(nv)?', ':'')+(nv-day)+' kundan keyin) — '+VET[D[nv][4]]+'.';
+ if(fill){$('#w').value=st.log[day]||'';$('#mort').value=st.mort[day]||''}
+ renderRes();
+ $('#alive').textContent=al!==null?'Tirik bosh: '+al+' (jami ulim: '+(+st.birds-al)+')':'Bosh sonini kiriting — ulim va poda jami hisoblanadi.';
+ document.querySelectorAll('#body tr').forEach((tr,i)=>tr.classList.toggle('sel',i===day));
+ renderChart()}
+
+function renderRes(){
+ const w=+$('#w').value,r=$('#res');
+ if(!w){r.className='res';r.innerHTML='Vaznni kiriting — standart bilan solishtiraman.';return}
+ const s=D[day][0],v=(w-s)/s*100;
+ r.className='res '+cls(v);
+ r.innerHTML='<b>'+sign(v)+'</b> ('+(w>=s?'+':'')+Math.round(w-s)+' g)<br>'+verdict(v)}
+
+function renderChart(){
+ const m=MET[met],W=360,H=210,L=42,R=10,T=10,B=26;
+ const vals=D.map(r=>r[m.i]),logs=met==='w'?Object.keys(st.log).map(k=>[+k,+st.log[k]]).sort((a,b)=>a[0]-b[0]):[];
+ const mx=Math.max(...vals,...logs.map(x=>x[1]))*1.05;
+ const X=d=>L+d/N*(W-L-R),Y=v=>H-B-v/mx*(H-T-B);
+ let g='';
+ for(let i=0;i<=4;i++){const v=mx*i/4,y=Y(v);g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="var(--line)"/><text x="'+(L-5)+'" y="'+(y+4)+'" text-anchor="end" font-size="11" fill="var(--mut)">'+Math.round(v)+'</text>'}
+ for(let d=0;d<=N;d+=7)g+='<text x="'+X(d)+'" y="'+(H-8)+'" text-anchor="middle" font-size="11" fill="var(--mut)">'+d+'</text>';
+ g+='<path d="'+vals.map((v,d)=>(d?'L':'M')+X(d).toFixed(1)+' '+Y(v).toFixed(1)).join('')+'" fill="none" stroke="var(--std)" stroke-width="3" stroke-linejoin="round"/>';
+ if(logs.length){g+='<path d="'+logs.map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(1)+' '+Y(p[1]).toFixed(1)).join('')+'" fill="none" stroke="var(--act)" stroke-width="2.5"/>'+logs.map(p=>'<circle cx="'+X(p[0])+'" cy="'+Y(p[1])+'" r="4.5" fill="var(--act)" stroke="var(--card)" stroke-width="2"/>').join('')}
+ g+='<line x1="'+X(day)+'" x2="'+X(day)+'" y1="'+T+'" y2="'+(H-B)+'" stroke="var(--ink)" stroke-dasharray="4 4" opacity=".5"/><circle cx="'+X(day)+'" cy="'+Y(vals[day])+'" r="6" fill="var(--std)" stroke="var(--ink)" stroke-width="2"/>';
+ $('#chart').innerHTML=g;$('#legA').hidden=met!=='w';
+ $('#chips').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===met))}
+
+function setDay(d){day=Math.max(0,Math.min(N,Math.round(+d)||0));render()}
+$('#chips').innerHTML=Object.keys(MET).map(k=>'<button data-m="'+k+'" aria-pressed="false">'+MET[k].n+' ('+MET[k].u+')</button>').join('');
+$('#chips').addEventListener('click',e=>{const k=e.target.dataset.m;if(k){met=k;renderChart()}});
+$('#body').innerHTML=D.map((r,i)=>'<tr tabindex="0" data-d="'+i+'"><td>'+i+'</td><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+VET[r[4]]+'</td></tr>').join('');
+const pick=e=>{const tr=e.target.closest('tr');if(tr){setDay(tr.dataset.d);window.scrollTo({top:0,behavior:'smooth'})}};
+$('#body').addEventListener('click',pick);
+$('#body').addEventListener('keydown',e=>{if(e.key==='Enter')pick(e)});
+$('#prev').addEventListener('click',()=>setDay(day-1));
+$('#next').addEventListener('click',()=>setDay(day+1));
+$('#range').addEventListener('input',e=>setDay(e.target.value));
+$('#today').addEventListener('click',()=>{const c=curDay();if(c!==null)setDay(c);else $('#start').focus()});
+$('#start').addEventListener('change',e=>{st.start=e.target.value;save();const c=curDay();if(c!==null)setDay(c);else render(false)});
+$('#birds').addEventListener('input',e=>{st.birds=e.target.value;save();render(false)});
+$('#w').addEventListener('input',renderRes);
+$('#save').addEventListener('click',()=>{
+ const w=+$('#w').value,m=+$('#mort').value;
+ if(w>0)st.log[day]=w;else delete st.log[day];
+ if(m>0)st.mort[day]=m;else delete st.mort[day];
+ save();render()});
+
+$('#start').value=st.start||'';$('#birds').value=st.birds||'';
+const c0=curDay();day=c0!==null?c0:0;render();
+</script>
+<script>
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
