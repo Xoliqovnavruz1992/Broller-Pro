@@ -7,4 +7,4 @@ Joylash (eng oson yo'l): https://app.netlify.com/drop sahifasiga shu papkani tas
 Berilgan https:// havolani telefonda Chrome'da oching -> menyu -> "Install app" / "Ilovani o'rnatish".
 PWA faqat https:// orqali o'rnatiladi va offline ishlaydi (faylni telefondan to'g'ridan-to'g'ri ochsangiz ishlamaydi).
 
-Yangilash: index.html o'zgarsa, sw.js ichidagi 'ross308-v2' ni 'ross308-v3' ga o'zgartiring.
+Yangilash: index.html o'zgarsa, sw.js ichidagi 'ross308-v5' ni 'ross308-v6' ga o'zgartiring.
