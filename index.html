@@ -116,6 +116,12 @@ details summary{cursor:pointer;font:600 17px "Bricolage Grotesque",system-ui,san
   <div id="alive" class="note"></div>
 </section>
 
+<section class="card" aria-label="Hisobot">
+  <h2>Hisobot (Excel)</h2>
+  <button id="xl">Excel'ga yuklash (.xlsx)</button>
+  <p class="note" id="xlMsg">Barcha 0–45 kun, sizning vazn va ulim ma'lumotlaringiz bilan.</p>
+</section>
+
 <section class="card" aria-label="Grafik">
   <h2>Grafik</h2>
   <div class="chips" id="chips"></div>
@@ -135,6 +141,7 @@ details summary{cursor:pointer;font:600 17px "Bricolage Grotesque",system-ui,san
 </section>
 </main>
 
+<script src="xlsx.js"></script>
 <script>
 const VET=['Shakarli suv (5%)','Vitamin ADE','Vaksina IBK (4/91)+(H12…)','Colifloks (antibiotik)','Vaksina Gambora','Vitamin B kompleks','Vaksina IBK (H120)','Vaksina ND (La-Sota)','Askorbinka','Limon kislota','Toza suv'];
 const D=[[49,13,25,33,0],[56,17,32,33,1],[72,20,39,32,1],[89,23,43,32,1],[109,27,50,31,2],[132,31,57,31,1],[157,35,64,30,3],[185,39,71,29,3],[217,43,80,29,3],[251,48,88,28,1],[289,53,98,28,4],[330,58,105,27,5],[375,63,116,27,5],[422,69,123,27,5],[473,74,136,26,6],[527,80,147,26,1],[585,86,158,26,1],[654,92,168,25,4],[709,98,177,25,5],[775,104,190,25,5],[844,110,201,25,5],[916,116,212,25,7],[990,122,222,24,1],[1066,128,235,24,1],[1200,134,242,24,1],[1315,140,255,24,1],[1410,146,267,23,1],[1520,152,275,23,8],[1600,157,285,23,8],[1710,163,294,23,8],[1825,168,305,22,9],[1925,173,314,22,9],[2030,178,325,22,9],[2120,183,329,22,8],[2230,187,342,22,8],[2335,192,348,22,8],[2450,196,356,21,8],[2560,200,363,21,8],[2664,204,370,21,10],[2780,208,377,21,10],[2895,211,384,21,9],[2995,215,390,21,9],[3055,218,397,20,9],[3165,221,401,20,9],[3290,223,405,20,9],[3400,225,408,19,10]];
@@ -218,6 +225,17 @@ $('#save').addEventListener('click',()=>{
  if(w>0)st.log[day]=w;else delete st.log[day];
  if(m>0)st.mort[day]=m;else delete st.mort[day];
  save();render()});
+
+$('#xl').addEventListener('click',()=>{
+ const msg=$('#xlMsg');
+ try{
+  const now=new Date(),name='Ross308_hisobot_'+now.getFullYear()+'-'+p2(now.getMonth()+1)+'-'+p2(now.getDate())+'.xlsx';
+  const blob=new Blob([makeReportXlsx(st,D,VET)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);
+  msg.textContent='Yuklandi: '+name+' (Yuklashlar papkasida).';
+ }catch(e){msg.textContent='Xatolik: fayl yaratilmadi. Sahifani yangilab qayta urinib ko\'ring.'}
+});
 
 $('#start').value=st.start||'';$('#birds').value=st.birds||'';
 const c0=curDay();day=c0!==null?c0:0;render();
