@@ -87,6 +87,13 @@ td.mine{color:var(--act);font-weight:600}
 .fl .fh b{font:800 17px "Bricolage Grotesque",system-ui,sans-serif;overflow-wrap:anywhere}
 .fl .fs{font-size:13px;color:var(--mut);margin-top:6px}
 .fl .btns button{min-height:40px;flex:1 1 90px;padding:0 10px;font-size:14px}
+.al{padding:10px 12px;border-radius:10px;background:var(--chip);border-left:6px solid var(--line);margin-top:8px;font-size:14px}
+.al.bad{border-color:var(--bad)}.al.warn{border-color:var(--warn)}.al.info{border-color:var(--act)}.al.ok{border-color:var(--ok)}
+.chk{display:flex;gap:10px;align-items:center;margin-top:12px;font-size:14px;color:var(--ink)}
+input[type=checkbox]{width:22px;min-height:22px;height:22px;flex:none;accent-color:var(--act)}
+.nav button{position:relative}
+.dot{position:absolute;top:8px;left:calc(50% + 9px);width:10px;height:10px;border-radius:50%;background:var(--bad);border:2px solid var(--card);box-sizing:content-box}
+.dot.warn{background:var(--warn)}
 .okmsg{color:var(--ok);font-weight:600;font-size:14px;min-height:20px;margin:8px 0 0}
 /* pastki menyu */
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -121,6 +128,12 @@ td.mine{color:var(--act);font-weight:600}
     <div><label for="birds">Bosh soni</label><input id="birds" type="number" min="0" inputmode="numeric" placeholder="2400"></div>
     <button class="ghost" id="today">Bugun</button>
   </div>
+</section>
+
+<section class="card" id="alertToday" aria-label="Diqqat" hidden>
+  <h2>Diqqat</h2>
+  <div id="alertTodayList"></div>
+  <p class="note">Batafsil: "Poda" bo'limida.</p>
 </section>
 
 <section class="card" aria-label="Shu kun me'yori">
@@ -163,10 +176,21 @@ td.mine{color:var(--act);font-weight:600}
 <!-- ===== PODA ===== -->
 <section class="tab" id="tab-flock" role="tabpanel" aria-label="Poda" hidden>
 <h1>Poda holati</h1>
+<section class="card" aria-label="Ogohlantirishlar">
+  <h2>Ogohlantirishlar</h2>
+  <div id="alertList"></div>
+</section>
 <section class="card">
   <h2><span id="flockDay"></span></h2>
   <div id="flockStat"></div>
   <p class="note">Kunni "Bugun" bo'limida o'zgartirasiz.</p>
+</section>
+<section class="card" aria-label="Sotishga tayyorlik">
+  <h2>Sotishga tayyorlik</h2>
+  <label for="target">Maqsadli vazn (g)</label>
+  <input id="target" type="number" min="300" step="50" inputmode="numeric" placeholder="2000">
+  <div id="forecast"></div>
+  <p class="note">Prognoz hozirgi vazningiz standartdan qanchalik farq qilishi o'zgarmaydi degan taxminga tayanadi. Yangi vazn kiritgan sari aniqlashadi.</p>
 </section>
 <section class="card" aria-label="Grafik">
   <h2>Grafik</h2>
@@ -182,6 +206,15 @@ td.mine{color:var(--act);font-weight:600}
 <section class="card" aria-label="Natija">
   <h2 id="moneyTitle">Natija</h2>
   <div id="moneyStat"></div>
+</section>
+<section class="card" aria-label="Yem rejasi">
+  <h2>Yem rejasi — keyingi 7 kun</h2>
+  <div class="row">
+    <div><label for="pPrice">Yem narxi (so'm/kg)</label><input id="pPrice" type="number" min="0" inputmode="numeric" placeholder="5500"></div>
+    <div><label for="pBag">Qop hajmi (kg)</label><input id="pBag" type="number" min="1" inputmode="decimal" placeholder="50"></div>
+  </div>
+  <label class="chk"><input type="checkbox" id="pAdj"><span>Haqiqiy iste'mol nisbati bilan hisoblash</span></label>
+  <div id="planOut"></div>
 </section>
 <section class="card" aria-label="Xarajat">
   <h2>Xarajat qo'shish</h2>
@@ -260,7 +293,7 @@ td.mine{color:var(--act);font-weight:600}
 
 <nav class="nav" role="tablist" aria-label="Bo'limlar">
   <button role="tab" data-t="today" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Bugun</span></button>
-  <button role="tab" data-t="flock" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18M7 20v-7M12 20V6M17 20v-10"/></svg><span>Poda</span></button>
+  <button role="tab" data-t="flock" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18M7 20v-7M12 20V6M17 20v-10"/></svg><span>Poda</span><i class="dot" id="navDot" hidden></i></button>
   <button role="tab" data-t="money" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="3"/><path d="M3 10h18M16 15h2"/></svg><span>Moliya</span></button>
   <button role="tab" data-t="table" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16"/></svg><span>Jadval</span></button>
   <button role="tab" data-t="admin" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><span>Boshqaruv</span></button>
@@ -283,10 +316,11 @@ const MET={w:{n:'Vazn',u:'g',i:0},f:{n:'Ozuqa',u:'g',i:1},a:{n:'Suv',u:'ml',i:2}
 const TABS=['today','flock','money','table','admin'];
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const CATS=['Jo\'ja','Yem','Dori va vaksina','Gaz, elektr, suv','Ish haqi','Boshqa'];
-const mkFlock=name=>({id:uid(),name:name||'Poda',start:'',birds:'',mort:{},log:{},feed:{},water:{},note:{},costs:[],sales:[],closed:''});
+const mkFlock=name=>({id:uid(),name:name||'Poda',start:'',birds:'',mort:{},log:{},feed:{},water:{},note:{},costs:[],sales:[],closed:'',plan:{target:2000,price:'',bag:50,adj:false}});
 function normFlock(f){const o=Object.assign(mkFlock(),f||{});delete o.backup;
  ['mort','log','feed','water','note'].forEach(k=>{if(!o[k]||typeof o[k]!=='object'||Array.isArray(o[k]))o[k]={}});
  ['costs','sales'].forEach(k=>{if(!Array.isArray(o[k]))o[k]=[]});
+ o.plan=Object.assign({target:2000,price:'',bag:50,adj:false},o.plan&&typeof o.plan==='object'?o.plan:{});
  o.name=String(o.name||'Poda');return o}
 let store={active:'',flocks:[],backup:''},st,day=0,met='w';
 try{
@@ -362,7 +396,7 @@ function render(fill=true){
  if(fill){$('#w').value=st.log[day]||'';$('#mort').value=st.mort[day]||'';$('#feed').value=st.feed[day]||'';$('#water').value=st.water[day]||'';$('#note').value=st.note[day]||'';$('#saved').textContent=''}
  renderRes();renderCmp();
  $('#alive').textContent=al!==null?'Tirik bosh: '+al+' (jami ulim: '+(+st.birds-al)+')':'Bosh sonini kiriting — ulim va poda jami hisoblanadi.';
- renderTable();renderFlock();renderChart();renderAdmin();renderFlockSel();renderMoney();renderPodalar()}
+ renderTable();renderFlock();renderChart();renderAdmin();renderFlockSel();renderMoney();renderPodalar();renderAlerts();renderForecast();renderPlan()}
 
 function renderRes(){
  const w=+$('#w').value,r=$('#res');
@@ -424,6 +458,71 @@ function renderMoney(){
  const none='<p class="note">Hali yozuv yo\'q.</p>',del=(k,x)=>'<button class="ghost" data-del="'+k+'" data-id="'+esc(x.id)+'" aria-label="O\'chirish">×</button>';
  $('#costList').innerHTML=st.costs.length?st.costs.slice().reverse().map(x=>'<div class="li"><div class="t"><b>'+esc(x.cat)+' · '+so(num(x.amount))+' so\'m</b><span>'+dmy(x.date)+(x.note?' · '+esc(x.note):'')+'</span></div>'+del('c',x)+'</div>').join(''):none;
  $('#saleList').innerHTML=st.sales.length?st.sales.slice().reverse().map(x=>'<div class="li"><div class="t"><b>'+kg(num(x.kg))+' kg × '+so(num(x.price))+' = '+so(num(x.kg)*num(x.price))+' so\'m</b><span>'+dmy(x.date)+(x.note?' · '+esc(x.note):'')+'</span></div>'+del('s',x)+'</div>').join(''):none}
+function alertsFor(){
+ const out=[],add=(lv,t)=>out.push({lv,t}),al=alive(day),b=+st.birds||0;
+ const m=num(st.mort[day]);
+ if(m&&al!==null){const pct=m/(al+m)*100;
+  if(pct>=0.5)add('bad','Bugungi ulim: '+m+' bosh ('+pct.toFixed(2)+'%) — yuqori. Sababini aniqlang, kerak bo\'lsa veterinarga murojaat qiling.');
+  else if(pct>=0.3)add('warn','Bugungi ulim: '+m+' bosh ('+pct.toFixed(2)+'%) — odatdagidan ko\'proq. Podani kuzatib turing.')}
+ if(b&&al!==null){const cp=(b-al)/b*100;
+  if(cp>=5)add('bad','Jami ulim '+cp.toFixed(1)+'% — yuqori. Sababini aniqlash kerak.');
+  else if(cp>=3)add('warn','Jami ulim '+cp.toFixed(1)+'% — me\'yor chegarasiga yaqin.');
+  else if(day<=7&&cp>=1.5)add('warn','Birinchi haftada jami ulim '+cp.toFixed(1)+'% — jo\'ja sifati, harorat va suvni tekshiring.')}
+ const lw=lastW(day);
+ if(lw){const age=day-lw[0],sd=D[lw[0]][0],v=(lw[1]-sd)/sd*100;
+  if(age<=3){
+   if(v<=-7)add('bad','Vazn standartdan '+Math.abs(v).toFixed(1)+'% past ('+lw[0]+'-kun). Yem, suv va haroratni tekshiring.');
+   else if(v<=-3)add('warn','Vazn standartdan '+Math.abs(v).toFixed(1)+'% past ('+lw[0]+'-kun). Ozuqa iste\'moli va suv bosimiga e\'tibor bering.');
+   else if(v>=7)add('info','Vazn standartdan '+v.toFixed(1)+'% yuqori ('+lw[0]+'-kun). Bir xillikni (uniformity) tekshiring.')}
+  else if(day>=7)add('info','Oxirgi vazn '+age+' kun oldin ('+lw[0]+'-kun) kiritilgan. Yangisini o\'lchang.')}
+ else if(day>=7)add('info','Hali vazn kiritilmagan. Haftada kamida bir marta o\'rtacha vaznni o\'lchang.');
+ const recent=(o,i)=>{for(let k=day;k>=Math.max(0,day-2);k--){const a=alive(k);if(num(o[k])&&a)return [k,num(o[k])/(D[k][i]*a/1000)]}return null};
+ const fr=recent(st.feed,1);
+ if(fr){const v=(fr[1]-1)*100;
+  if(v<=-10)add('warn','Ozuqa iste\'moli standartdan '+Math.abs(v).toFixed(0)+'% past ('+fr[0]+'-kun). Kasallik, issiq-sovuq yoki yem sifatini tekshiring.');
+  else if(v>=10)add('info','Ozuqa standartdan '+v.toFixed(0)+'% ko\'p ('+fr[0]+'-kun). Yem isrofi yoki o\'lchov xatosi bo\'lishi mumkin.')}
+ const wr=recent(st.water,2);
+ if(wr){const v=(wr[1]-1)*100;
+  if(v<=-15)add('warn','Suv iste\'moli standartdan '+Math.abs(v).toFixed(0)+'% past ('+wr[0]+'-kun). Suv bosimi va idishlarni tekshiring.');
+  else if(v>=15)add('warn','Suv iste\'moli standartdan '+v.toFixed(0)+'% ko\'p ('+wr[0]+'-kun). Issiqlik yoki kasallik belgisi bo\'lishi mumkin.')}
+ for(let k=day;k<=Math.min(N,day+1);k++){if(VAC.includes(D[k][4]))add('info',(k===day?'Bugun':'Ertaga')+' ('+k+'-kun): '+VET[D[k][4]]+'.')}
+ const o={bad:0,warn:1,info:2};out.sort((a,b)=>o[a.lv]-o[b.lv]);return out}
+function renderAlerts(){
+ const out=alertsFor(),hasData=Object.keys(st.log).length||Object.keys(st.mort).length||Object.keys(st.feed).length||Object.keys(st.water).length;
+ const item=x=>'<div class="al '+x.lv+'">'+esc(x.t)+'</div>';
+ $('#alertList').innerHTML=out.length?out.map(item).join(''):(hasData?'<div class="al ok">Hozircha hammasi me\'yorda ✓</div>':'<p class="note" style="margin-top:0">Vazn, ulim, ozuqa va suv kiritilgach, bu yerda ogohlantirishlar chiqadi.</p>');
+ const hot=out.filter(x=>x.lv!=='info');
+ $('#alertToday').hidden=!hot.length;$('#alertTodayList').innerHTML=hot.slice(0,3).map(item).join('');
+ const d=$('#navDot');d.hidden=!hot.length;d.className='dot'+(hot.some(x=>x.lv==='bad')?'':' warn')}
+function renderForecast(){
+ const T=num(st.plan.target)||2000,el=$('#target');if(document.activeElement!==el)el.value=st.plan.target||'';
+ const std=D.map(r=>r[0]),lw=lastW(day),al=alive(day),rows=[];
+ const fs=std.findIndex(w=>w>=T);
+ let r=1,base=0;if(lw){r=lw[1]/std[lw[0]];base=lw[0]}
+ let adj=-1;for(let i=base;i<=N;i++)if(std[i]*r>=T){adj=i;break}
+ if(adj<0){$('#forecast').innerHTML='<div class="al warn">'+T+' g vaznga '+N+'-kungacha ham yetmaydi. Maqsadli vaznni kamaytirib ko\'ring.</div>';return}
+ const rem=adj-day,when=rem>0?rem+' kundan keyin':rem===0?'bugun':'yetib bo\'lgan';
+ rows.push(mrow('Taxminiy sotish kuni',adj+'<i>-kun</i>',(dateOf(adj)?dateOf(adj)+' · ':'')+when+(lw?' · vazningiz standartning '+(r*100).toFixed(0)+'%':' · standart bo\'yicha (vazn kiriting — aniqroq bo\'ladi)')));
+ if(lw&&fs>=0&&fs!==adj)rows.push(mrow('Standart bo\'yicha',fs+'<i>-kun</i>',(dateOf(fs)?dateOf(fs)+' · ':'')+(fs-day>0?(fs-day)+' kundan keyin':'')));
+ rows.push(mrow('Taxminiy tirik vazn (poda)',al!==null?kg(al*T/1000)+'<i>kg</i>':'—',al!==null?'tirik bosh: '+al+' × '+T+' g':'Bosh sonini kiriting'));
+ $('#forecast').innerHTML=rows.join('')}
+function renderPlan(){
+ const p=st.plan,bag=num(p.bag)||50,price=num(p.price);
+ [['#pPrice',p.price||''],['#pBag',p.bag||'']].forEach(x=>{if(document.activeElement!==$(x[0]))$(x[0]).value=x[1]});
+ $('#pAdj').checked=!!p.adj;
+ const al=alive(day);
+ if(al===null){$('#planOut').innerHTML='<p class="note">Bosh sonini "Bugun" bo\'limida kiriting.</p>';return}
+ const rs=[];for(let k=day;k>=0&&rs.length<3;k--){const a=alive(k);if(num(st.feed[k])&&a)rs.push(num(st.feed[k])/(D[k][1]*a/1000))}
+ const avg=rs.length?rs.reduce((a,b)=>a+b)/rs.length:null,ratio=(p.adj&&avg)?avg:1;
+ const last=Math.min(N,day+7);
+ if(last<=day){$('#planOut').innerHTML='<p class="note">Rejalashtiradigan kun qolmagan.</p>';return}
+ let tot=0,tw=0;const lines=[];
+ for(let k=day+1;k<=last;k++){const f=D[k][1]*al*ratio/1000;tot+=f;tw+=D[k][2]*al/1000;lines.push('<div class="li"><div class="t"><b>'+k+'-kun'+(dateOf(k)?' · '+dateOf(k):'')+'</b></div><b>'+kg(f)+' kg</b></div>')}
+ const rows=[mrow('Jami yem',kg(tot)+'<i>kg</i>',(last-day)+' kun · '+Math.ceil(tot/bag)+' qop ('+bag+' kg)'),mrow('Taxminiy suv',kg(tw)+'<i>litr</i>',(last-day)+' kun')];
+ if(price)rows.splice(1,0,mrow('Yem narxi',so(tot*price)+'<i>so\'m</i>',so(price)+' so\'m/kg bo\'yicha'));
+ let note='Hisob '+al+' tirik bosh uchun (yana ulim bo\'lmaydi deb).';
+ if(avg)note+=' Oxirgi '+rs.length+' kunda standartning '+(avg*100).toFixed(0)+'% ini berdingiz'+(p.adj?'; reja shu nisbat bilan hisoblandi.':'.');
+ $('#planOut').innerHTML=rows.join('')+lines.join('')+'<p class="note">'+note+'</p>'}
 function renderPodalar(){
  const nm=$('#flockName');if(document.activeElement!==nm)nm.value=st.name;
  const btn=(a,t,c)=>'<button'+(c?' class="'+c+'"':'')+' data-act="'+a+'">'+t+'</button>';
@@ -487,6 +586,12 @@ $('#xl').addEventListener('click',async()=>{
  const msg=$('#xlMsg');
  try{msg.textContent='Tayyor: '+await downloadReport()}
  catch(e){msg.textContent=e&&e.code==='declined'?'Yuklash bekor qilindi.':'Xatolik: fayl yaratilmadi. Sahifani yangilab qayta urinib ko\'ring.'}});
+
+/* ---- Prognoz va yem rejasi sozlamalari ---- */
+$('#target').addEventListener('input',e=>{const v=Math.round(+e.target.value);st.plan.target=v>0?v:'';save();renderForecast()});
+$('#pPrice').addEventListener('input',e=>{const v=Math.round(+e.target.value);st.plan.price=v>0?v:'';save();renderPlan()});
+$('#pBag').addEventListener('input',e=>{const v=+e.target.value;st.plan.bag=v>0?v:'';save();renderPlan()});
+$('#pAdj').addEventListener('change',e=>{st.plan.adj=e.target.checked;save();renderPlan()});
 
 /* ---- Podalarni boshqarish ---- */
 function activate(id){
@@ -552,6 +657,7 @@ function cleanFlock(d){
  if(typeof d.id==='string'&&d.id)f.id=d.id.slice(0,30);
  f.start=isoOk(d.start);f.birds=+d.birds>0?String(Math.round(+d.birds)):'';
  f.mort=cleanMap(d.mort);f.log=cleanMap(d.log);f.feed=cleanMap(d.feed);f.water=cleanMap(d.water);f.note=cleanMap(d.note,true);f.closed=isoOk(d.closed);
+ const pl=d.plan&&typeof d.plan==='object'?d.plan:{};f.plan={target:(+pl.target>=300&&+pl.target<=6000)?Math.round(+pl.target):2000,price:+pl.price>0?Math.round(+pl.price):'',bag:+pl.bag>0&&+pl.bag<=1000?+pl.bag:50,adj:pl.adj===true};
  const arr=x=>Array.isArray(x)?x.slice(0,500).filter(y=>y&&typeof y==='object'):[];
  f.costs=arr(d.costs).map(x=>({id:uid(),cat:String(x.cat||'Boshqa').slice(0,40),amount:Math.round(num(x.amount)),note:String(x.note||'').slice(0,100),date:isoOk(x.date)})).filter(x=>x.amount>0);
  f.sales=arr(d.sales).map(x=>({id:uid(),kg:num(x.kg),price:Math.round(num(x.price)),note:String(x.note||'').slice(0,100),date:isoOk(x.date)})).filter(x=>x.kg>0&&x.price>0);
