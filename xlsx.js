@@ -87,8 +87,14 @@
     // ----- Kunlik hisobot -----
     var heads = ['Kun', 'Sana', 'Standart vazn, g', 'Haqiqiy vazn, g', 'Farq, %', 'Ozuqa, g/bosh', 'Suv, ml/bosh', 'Harorat, °C', 'Veterinariya',
       'Ulim, bosh', 'Tirik bosh', 'Poda ozuqa, kg', 'Poda suv, litr', 'Poda vazn (std), kg', 'Kunlik o\'sish, g', 'Jami ozuqa (1 bosh), kg', 'FCR (std)',
-      'Ozuqa berildi, kg (poda)', 'Suv berildi, litr (poda)', 'Haqiqiy ozuqa, g/bosh', 'Haqiqiy suv, ml/bosh', 'Izoh'];
-    var L = 'ABCDEFGHIJKLMNOPQRSTUV';
+      'Ozuqa berildi, kg (poda)', 'Suv berildi, litr (poda)', 'Haqiqiy ozuqa, g/bosh', 'Haqiqiy suv, ml/bosh', 'Izoh',
+      'Bajarildi (emlash/davolash)', 'Namuna soni', 'Bir xillik, %', 'CV, %'];
+    var L = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    var sl = st.sales || [], TASK = [2, 3, 4, 6, 7], doneM = st.done || {}, smp = st.samples || {};
+    var rl0 = 12 + Math.max((st.costs || []).length, sl.length) + 5 - 1;
+    var soldAt = function (i) { var t = 0; sl.forEach(function (x) { if (+x.birds > 0 && x.day !== '' && x.day != null && +x.day <= i) t += +x.birds; }); return t; };
+    var soldKgAt = function (i) { var t = 0; sl.forEach(function (x) { if (+x.birds > 0 && x.day !== '' && x.day != null && +x.day <= i) t += +x.kg || 0; }); return t; };
+    var MOK = 'Moliya!$K$12:$K$' + rl0, MOL = 'Moliya!$L$12:$L$' + rl0, MOG = 'Moliya!$G$12:$G$' + rl0;
     var rows = [row(1, heads.map(function (h, i) { return cs(L[i] + '1', 1, h); }))];
     var cumM = 0, cumF = 0, sumFeed = 0, sumWater = 0, sumMortAll = 0, aliveAtCur = '', feedToCur = '', waterToCur = '';
     var lastW = '', lastWDay = '', feedDays = [], feedN = 0, aliveArr = [], feedCumAct = [], fcrStd = [], sumFeedAct = 0, sumWaterAct = 0;
@@ -96,7 +102,7 @@
     for (var i = 0; i <= N; i++) {
       var r = i + 2, d = D[i], std = d[0], act = +log[i] > 0 ? +log[i] : null, mo = +mort[i] > 0 ? +mort[i] : null;
       cumM += mo || 0; cumF += d[1]; sumMortAll += mo || 0;
-      var alive = birds ? birds - cumM : '';
+      var alive = birds ? Math.max(birds - cumM - soldAt(i), 0) : '';
       var fa = +feedAct[i] > 0 ? +feedAct[i] : null, wa = +waterAct[i] > 0 ? +waterAct[i] : null, nt = note[i] ? String(note[i]) : '';
       sumFeedAct += fa || 0; if (fa !== null) feedN++; feedDays[i] = feedN; sumWaterAct += wa || 0; aliveArr[i] = alive; feedCumAct[i] = sumFeedAct; fcrStd[i] = cumF / std;
       var lf = alive === '' ? '' : d[1] * alive / 1000, lw = alive === '' ? '' : d[2] * alive / 1000, ls = alive === '' ? '' : std * alive / 1000;
@@ -113,7 +119,7 @@
       c.push(cn('H' + r, 2, d[3]));
       c.push(cs('I' + r, 2, VET[d[4]]));
       c.push(mo !== null ? cn('J' + r, 8, mo) : cb('J' + r, 8));
-      c.push(cf('K' + r, 3, 'IF(Xulosa!$B$3="","",Xulosa!$B$3-SUM(J$2:J' + r + '))', alive));
+      c.push(cf('K' + r, 3, 'IF(Xulosa!$B$3="","",MAX(Xulosa!$B$3-SUM(J$2:J' + r + ')-SUMIF(' + MOK + ',"<="&A' + r + ',' + MOL + '),0))', alive));
       c.push(cf('L' + r, 4, 'IF(K' + r + '="","",F' + r + '*K' + r + '/1000)', lf));
       c.push(cf('M' + r, 4, 'IF(K' + r + '="","",G' + r + '*K' + r + '/1000)', lw));
       c.push(cf('N' + r, 4, 'IF(K' + r + '="","",C' + r + '*K' + r + '/1000)', ls));
@@ -125,9 +131,15 @@
       c.push(cf('T' + r, 4, 'IF(OR(R' + r + '="",K' + r + '="",K' + r + '=0),"",R' + r + '*1000/K' + r + ')', (fa !== null && alive > 0) ? fa * 1000 / alive : ''));
       c.push(cf('U' + r, 4, 'IF(OR(S' + r + '="",K' + r + '="",K' + r + '=0),"",S' + r + '*1000/K' + r + ')', (wa !== null && alive > 0) ? wa * 1000 / alive : ''));
       c.push(nt ? cs('V' + r, 8, nt) : cb('V' + r, 8));
+      var sa = smp[i] && smp[i].length ? smp[i].map(Number).filter(function (v) { return v > 0; }) : [], sq = null;
+      if (sa.length > 1) { var mm = sa.reduce(function (a, b) { return a + b; }, 0) / sa.length, sd = Math.sqrt(sa.reduce(function (a, b) { return a + (b - mm) * (b - mm); }, 0) / (sa.length - 1)); sq = { u: sa.filter(function (v) { return Math.abs(v - mm) <= 0.1 * mm; }).length / sa.length * 100, cv: sd / mm * 100 }; }
+      c.push(TASK.indexOf(d[4]) >= 0 ? (doneM[i] ? cs('W' + r, 8, '✓') : cb('W' + r, 8)) : cb('W' + r, 2));
+      c.push(sa.length ? cn('X' + r, 2, sa.length) : cb('X' + r, 2));
+      c.push(sq ? cn('Y' + r, 4, sq.u) : cb('Y' + r, 4));
+      c.push(sq ? cn('Z' + r, 4, sq.cv) : cb('Z' + r, 4));
       rows.push(row(r, c));
     }
-    var widths = [6, 12, 11, 11, 9, 11, 11, 10, 26, 10, 10, 12, 12, 14, 12, 14, 9, 13, 13, 13, 13, 40];
+    var widths = [6, 12, 11, 11, 9, 11, 11, 10, 26, 10, 10, 12, 12, 14, 12, 14, 9, 13, 13, 13, 13, 40, 14, 9, 11, 8];
     var cols1 = '<cols>' + widths.map(function (w, i) { return '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>'; }).join('') + '</cols>';
     var sheetDaily = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet ' + NS + '>' +
       '<sheetViews><sheetView workbookViewId="0"><pane xSplit="2" ySplit="1" topLeftCell="C2" activePane="bottomRight" state="frozen"/></sheetView></sheetViews>' +
@@ -140,7 +152,7 @@
     var lookD = 'IFERROR(LOOKUP(2,1/(' + rng('D') + '<>""),' + rng('A') + '),"")';
     var sumTo = function (c) { return 'SUMIF(' + rng('A') + ',"<="&B4,' + rng(c) + ')'; };
     var needs = 'OR(B3="",B4="")';
-    var aliveNow = (birds && cur !== '') ? birds - (function () { var s = 0; for (var k = 0; k <= cur; k++) s += +mort[k] > 0 ? +mort[k] : 0; return s; })() : '';
+    var aliveNow = (birds && cur !== '') ? Math.max(birds - soldAt(cur) - (function () { var s = 0; for (var k = 0; k <= cur; k++) s += +mort[k] > 0 ? +mort[k] : 0; return s; })(), 0) : '';
     var S = [];
     S.push(row(1, [cs('A1', 11, 'Ross 308 — hisobot' + (st.name ? ' — ' + st.name : ''))]));
     S.push(row(2, [cs('A2', 10, 'Joylashtirilgan sana'), serial === null ? cb('B2', 9) : cn('B2', 9, serial)]));
@@ -148,18 +160,18 @@
     S.push(row(4, [cs('A4', 10, 'Bugungi kun (0–' + N + ')'), cf('B4', 2, 'IF(B2="","",MIN(' + N + ',MAX(0,TODAY()-B2)))', cur)]));
     S.push(row(5, [cs('A5', 10, 'Jami ulim, bosh'), cf('B5', 3, 'SUM(' + rng('J') + ')', sumMortAll)]));
     S.push(row(6, [cs('A6', 10, 'Ulim, %'), cf('B6', 6, 'IF(B3="","",B5/B3)', birds ? sumMortAll / birds : '')]));
-    S.push(row(7, [cs('A7', 10, 'Hozir tirik bosh'), cf('B7', 3, 'IF(' + needs + ',"",B3-' + sumTo('J') + ')', aliveNow)]));
+    S.push(row(7, [cs('A7', 10, 'Hozir tirik bosh'), cf('B7', 3, 'IF(' + needs + ',"",MAX(B3-' + sumTo('J') + '-SUMIF(' + MOK + ',"<="&B4,' + MOL + '),0))', aliveNow)]));
     S.push(row(8, [cs('A8', 10, 'Podaga jami ozuqa (shu kungacha), kg'), cf('B8', 4, 'IF(' + needs + ',"",' + sumTo('L') + ')', (birds && cur !== '') ? feedToCur : '')]));
     S.push(row(9, [cs('A9', 10, 'Podaga jami suv (shu kungacha), litr'), cf('B9', 4, 'IF(' + needs + ',"",' + sumTo('M') + ')', (birds && cur !== '') ? waterToCur : '')]));
     S.push(row(10, [cs('A10', 10, 'Oxirgi kiritilgan vazn, g'), cf('B10', 4, lookW, lastW)]));
     S.push(row(11, [cs('A11', 10, 'Oxirgi vazn kiritilgan kun'), cf('B11', 2, lookD, lastWDay)]));
     S.push(row(12, [cs('A12', 10, 'Standartdan farq, %'), cf('B12', 6, 'IF(B11="","",(B10-INDEX(' + rng('C') + ',B11+1))/INDEX(' + rng('C') + ',B11+1))', diff)]));
     var fcrAct = '';
-    if (birds && lastWDay !== '' && feedCumAct[lastWDay] > 0 && aliveArr[lastWDay] > 0 && feedDays[lastWDay] === lastWDay + 1) fcrAct = feedCumAct[lastWDay] / (lastW * aliveArr[lastWDay] / 1000);
+    if (birds && lastWDay !== '' && feedCumAct[lastWDay] > 0 && aliveArr[lastWDay] > 0 && feedDays[lastWDay] === lastWDay + 1) fcrAct = feedCumAct[lastWDay] / (lastW * aliveArr[lastWDay] / 1000 + soldKgAt(lastWDay));
     var sumA = 'SUMIF(' + rng('A') + ',"<="&B11,' + rng('R') + ')';
     S.push(row(13, [cs('A13', 10, 'Jami haqiqiy ozuqa, kg'), cf('B13', 4, 'SUM(' + rng('R') + ')', sumFeedAct)]));
     S.push(row(14, [cs('A14', 10, 'Jami haqiqiy suv, litr'), cf('B14', 4, 'SUM(' + rng('S') + ')', sumWaterAct)]));
-    S.push(row(15, [cs('A15', 10, 'Haqiqiy FCR (oxirgi vazn kuni bo\'yicha)'), cf('B15', 5, 'IF(OR(B3="",B11=""),"",IFERROR(IF(OR(' + sumA + '=0,COUNT(' + SH + 'R2:INDEX(' + rng('R') + ',B11+1))<B11+1),"",' + sumA + '/(B10*INDEX(' + rng('K') + ',B11+1)/1000)),""))', fcrAct)]));
+    S.push(row(15, [cs('A15', 10, 'Haqiqiy FCR (oxirgi vazn kuni bo\'yicha)'), cf('B15', 5, 'IF(OR(B3="",B11=""),"",IFERROR(IF(OR(' + sumA + '=0,COUNT(' + SH + 'R2:INDEX(' + rng('R') + ',B11+1))<B11+1),"",' + sumA + '/(B10*INDEX(' + rng('K') + ',B11+1)/1000+SUMIFS(' + MOG + ',' + MOK + ',"<="&B11,' + MOL + ',">0"))),""))', fcrAct)]));
     S.push(row(16, [cs('A16', 10, 'Standart FCR (shu kunga)'), cf('B16', 5, 'IF(B11="","",INDEX(' + rng('Q') + ',B11+1))', lastWDay === '' ? '' : fcrStd[lastWDay])]));
     S.push(row(18, [cs('A18', 0, 'Sariq kataklarga (sana, bosh soni, haqiqiy vazn, ulim, ozuqa, suv, izoh) ma\'lumot kiritsangiz, hisob avtomatik yangilanadi.')]));
     var sheetSum = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet ' + NS + '>' +
@@ -184,8 +196,8 @@
     MS.push(row(7, [cs('A7', 10, '1 kg tannarx, so\'m'), cf('B7', 3, 'IF(B6=0,"",B3/B6)', totK > 0 ? totC / totK : '')]));
     MS.push(row(8, [cs('A8', 10, '1 bosh hisobida foyda, so\'m'), cf('B8', 3, 'IF(Xulosa!$B$3="","",B5/Xulosa!$B$3)', birds ? (totR - totC) / birds : '')]));
     MS.push(row(9, [cs('A9', 10, 'O\'rtacha sotuv narxi, so\'m/kg'), cf('B9', 3, 'IF(B6=0,"",B4/B6)', totK > 0 ? totR / totK : '')]));
-    var mh = ['Xarajat toifasi', 'Izoh', 'Sana', 'Summa, so\'m', null, 'Sotuv sanasi', 'Kg', 'Narx, so\'m/kg', 'Summa, so\'m', 'Izoh'];
-    MS.push(row(11, mh.map(function (h, i) { return h === null ? '' : cs('ABCDEFGHIJ'[i] + '11', 1, h); })));
+    var mh = ['Xarajat toifasi', 'Izoh', 'Sana', 'Summa, so\'m', null, 'Sotuv sanasi', 'Kg', 'Narx, so\'m/kg', 'Summa, so\'m', 'Izoh', 'Kun (n-kun)', 'Sotilgan bosh'];
+    MS.push(row(11, mh.map(function (h, i) { return h === null ? '' : cs('ABCDEFGHIJKL'[i] + '11', 1, h); })));
     for (var q = 0; q < nR; q++) {
       var rr = r0 + q, cc = costs[q], ss = sales[q], mc = [];
       mc.push(cc ? cs('A' + rr, 8, cc.cat || '') : cb('A' + rr, 8));
@@ -197,9 +209,11 @@
       mc.push(ss ? cn('H' + rr, 12, +ss.price || 0) : cb('H' + rr, 12));
       mc.push(cf('I' + rr, 3, 'IF(OR(G' + rr + '="",H' + rr + '=""),"",G' + rr + '*H' + rr + ')', ss ? (+ss.kg || 0) * (+ss.price || 0) : ''));
       mc.push(ss && ss.note ? cs('J' + rr, 8, ss.note) : cb('J' + rr, 8));
+      mc.push(ss && ss.day !== '' && ss.day != null ? cn('K' + rr, 8, +ss.day) : cb('K' + rr, 8));
+      mc.push(ss && +ss.birds > 0 ? cn('L' + rr, 8, +ss.birds) : cb('L' + rr, 8));
       MS.push(row(rr, mc));
     }
-    var mw = [30, 28, 12, 16, 3, 13, 10, 14, 16, 28];
+    var mw = [30, 28, 12, 16, 3, 13, 10, 14, 16, 28, 11, 13];
     var sheetMoney = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet ' + NS + '>' +
       '<sheetViews><sheetView workbookViewId="0"/></sheetViews><sheetFormatPr defaultRowHeight="15"/>' +
       '<cols>' + mw.map(function (w, i) { return '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>'; }).join('') + '</cols>' +

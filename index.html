@@ -94,6 +94,7 @@ input[type=checkbox]{width:22px;min-height:22px;height:22px;flex:none;accent-col
 .nav button{position:relative}
 .dot{position:absolute;top:8px;left:calc(50% + 9px);width:10px;height:10px;border-radius:50%;background:var(--bad);border:2px solid var(--card);box-sizing:content-box}
 .dot.warn{background:var(--warn)}
+.samples-note{margin-top:8px}
 .okmsg{color:var(--ok);font-weight:600;font-size:14px;min-height:20px;margin:8px 0 0}
 /* pastki menyu */
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -113,6 +114,12 @@ input[type=checkbox]{width:22px;min-height:22px;height:22px;flex:none;accent-col
 <!-- ===== BUGUN ===== -->
 <section class="tab" id="tab-today" role="tabpanel" aria-label="Bugun">
 <h1>Ross 308 — kunlik jadval</h1>
+
+<section class="card" id="remind" aria-label="Eslatma" hidden>
+  <h2>Eslatma</h2>
+  <div id="remindList"></div>
+  <div class="btns" id="goTodayRow"><button class="ghost" id="goToday">Bugungi kunga o'tish</button></div>
+</section>
 
 <section class="card" aria-label="Kunni tanlash">
   <div id="flockRow" style="margin-bottom:12px" hidden><label for="flockSel">Poda</label><select id="flockSel"></select></div>
@@ -143,6 +150,7 @@ input[type=checkbox]{width:22px;min-height:22px;height:22px;flex:none;accent-col
   <div class="m"><span class="k">Suv</span><div class="v"><b id="vA"></b><span id="sA"></span></div></div>
   <div class="m"><span class="k">Harorat</span><div class="v"><b id="vT"></b></div></div>
   <div class="m"><span class="k">Veterinariya</span><div class="v"><span class="badge" id="vet"></span></div></div>
+  <label class="chk" id="doneRow" hidden><input type="checkbox" id="done"><span>Bajarildi ✓ (emlash/davolash)</span></label>
   <div class="sub">
     <div><span>Kunlik o'sish</span><b id="xG"></b></div>
     <div><span>Suv / ozuqa</span><b id="xR"></b></div>
@@ -171,6 +179,17 @@ input[type=checkbox]{width:22px;min-height:22px;height:22px;flex:none;accent-col
   <p class="okmsg" id="saved" role="status"></p>
   <div id="alive" class="note"></div>
 </section>
+
+<section class="card" aria-label="Vazn namunasi">
+  <h2>Vazn namunasi</h2>
+  <div class="row">
+    <div><label for="smp">Bitta tovuq vazni (g)</label><input id="smp" type="number" min="1" step="any" inputmode="decimal"></div>
+    <button id="smpAdd">Qo'shish</button>
+  </div>
+  <div id="smpOut"></div>
+  <div class="btns"><button class="ghost" id="smpUndo">Oxirgisini o'chirish</button><button class="ghost" id="smpClear">Hammasini tozalash</button></div>
+  <p class="note">Podaning turli joyidan 20–50 ta tovuqni tortib, har birini kiriting. O'rtacha vazn avtomatik "haqiqiy vazn" bo'lib saqlanadi, bir xillik (uniformity) va CV% hisoblanadi.</p>
+</section>
 </section>
 
 <!-- ===== PODA ===== -->
@@ -191,6 +210,15 @@ input[type=checkbox]{width:22px;min-height:22px;height:22px;flex:none;accent-col
   <input id="target" type="number" min="300" step="50" inputmode="numeric" placeholder="2000">
   <div id="forecast"></div>
   <p class="note">Prognoz hozirgi vazningiz standartdan qanchalik farq qilishi o'zgarmaydi degan taxminga tayanadi. Yangi vazn kiritgan sari aniqlashadi.</p>
+</section>
+<section class="card" aria-label="Zichlik">
+  <h2>Zichlik</h2>
+  <div class="row">
+    <div><label for="area">Xona maydoni (m²)</label><input id="area" type="number" min="1" step="any" inputmode="decimal" placeholder="Masalan: 120"></div>
+    <div><label for="dmax">Chegara (kg/m²)</label><input id="dmax" type="number" min="1" step="any" inputmode="decimal" placeholder="33"></div>
+  </div>
+  <div id="densOut"></div>
+  <p class="note">6×20 m xona = 120 m². Chegara iqlim, shamollatish va ruxsatnomangizga bog'liq (odatda 30–40 kg/m²). Vazn ortgan sari zichlik ham oshadi.</p>
 </section>
 <section class="card" aria-label="Grafik">
   <h2>Grafik</h2>
@@ -236,8 +264,13 @@ input[type=checkbox]{width:22px;min-height:22px;height:22px;flex:none;accent-col
     <div><label for="sPrice">Narx (so'm/kg)</label><input id="sPrice" type="number" min="0" inputmode="numeric" placeholder="22000"></div>
   </div>
   <div class="row gap">
+    <div><label for="sBirds">Sotilgan bosh (ixtiyoriy)</label><input id="sBirds" type="number" min="0" inputmode="numeric"></div>
+    <div><label for="sDay">Qaysi kunda (n-kun)</label><input id="sDay" type="number" min="0" max="45" inputmode="numeric"></div>
+  </div>
+  <div class="row gap">
     <div><label for="sNote">Izoh</label><input id="sNote" type="text" maxlength="100" placeholder="Masalan: bozor, xaridor nomi"></div>
   </div>
+  <p class="note">Poda qisman sotilsa, sotilgan bosh sonini kiriting: tirik bosh kamayadi, yem rejasi va zichlik shunga moslanadi.</p>
   <div class="btns"><button id="addSale">Qo'shish</button></div>
   <p class="note" id="sMsg" role="status"></p>
   <div id="saleList"></div>
@@ -316,9 +349,12 @@ const MET={w:{n:'Vazn',u:'g',i:0},f:{n:'Ozuqa',u:'g',i:1},a:{n:'Suv',u:'ml',i:2}
 const TABS=['today','flock','money','table','admin'];
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const CATS=['Jo\'ja','Yem','Dori va vaksina','Gaz, elektr, suv','Ish haqi','Boshqa'];
-const mkFlock=name=>({id:uid(),name:name||'Poda',start:'',birds:'',mort:{},log:{},feed:{},water:{},note:{},costs:[],sales:[],closed:'',plan:{target:2000,price:'',bag:50,adj:false}});
-function normFlock(f){const o=Object.assign(mkFlock(),f||{});delete o.backup;
- ['mort','log','feed','water','note'].forEach(k=>{if(!o[k]||typeof o[k]!=='object'||Array.isArray(o[k]))o[k]={}});
+const TASK=[2,3,4,6,7],REMIND_H=17;
+function initTrack(o){if(!o.start)return 0;const d=Math.floor((Date.now()-new Date(o.start+'T00:00:00').getTime())/864e5);return Math.max(0,Math.min(N,d||0))}
+const mkFlock=name=>({id:uid(),name:name||'Poda',start:'',birds:'',mort:{},log:{},feed:{},water:{},note:{},samples:{},done:{},area:'',dmax:33,trackFrom:0,costs:[],sales:[],closed:'',plan:{target:2000,price:'',bag:50,adj:false}});
+function normFlock(f){const had=!!f&&Number.isInteger(f.trackFrom);const o=Object.assign(mkFlock(),f||{});delete o.backup;
+ ['mort','log','feed','water','note','samples','done'].forEach(k=>{if(!o[k]||typeof o[k]!=='object'||Array.isArray(o[k]))o[k]={}});
+ if(!had)o.trackFrom=initTrack(o);
  ['costs','sales'].forEach(k=>{if(!Array.isArray(o[k]))o[k]=[]});
  o.plan=Object.assign({target:2000,price:'',bag:50,adj:false},o.plan&&typeof o.plan==='object'?o.plan:{});
  o.name=String(o.name||'Poda');return o}
@@ -341,7 +377,25 @@ const sumTo=(o,d)=>{let s=0;for(const k in o)if(+k<=d)s+=num(o[k]);return s};
 const stamp=()=>{const t=new Date();return t.getFullYear()+'-'+p2(t.getMonth()+1)+'-'+p2(t.getDate())};
 function dateOf(d){if(!st.start)return '';const t=new Date(st.start+'T00:00:00');t.setDate(t.getDate()+d);return p2(t.getDate())+'.'+p2(t.getMonth()+1)+'.'+t.getFullYear()}
 function curDay(){if(!st.start)return null;const d=Math.floor((Date.now()-new Date(st.start+'T00:00:00').getTime())/864e5);return d>=0?Math.min(d,N):null}
-function alive(d,f=st){const b=+f.birds;if(!b)return null;return Math.max(b-sumTo(f.mort,d),0)}
+function soldTo(f,d){let s=0;(f.sales||[]).forEach(x=>{const n=num(x.birds);if(n&&x.day!==''&&x.day!=null&&+x.day<=d)s+=n});return s}
+function soldKgTo(f,d){let s=0;(f.sales||[]).forEach(x=>{if(num(x.birds)&&x.day!==''&&x.day!=null&&+x.day<=d)s+=num(x.kg)});return s}
+function alive(d,f=st){const b=+f.birds;if(!b)return null;return Math.max(b-sumTo(f.mort,d)-soldTo(f,d),0)}
+function sampStats(a){const n=a.length,m=a.reduce((x,y)=>x+y,0)/n;let sd=0;if(n>1)sd=Math.sqrt(a.reduce((x,y)=>x+(y-m)*(y-m),0)/(n-1));
+ return {n,m,sd,cv:m?sd/m*100:0,unif:a.filter(x=>Math.abs(x-m)<=0.1*m).length/n*100,min:Math.min(...a),max:Math.max(...a)}}
+function lastSamp(d){for(let k=d;k>=0;k--){const a=st.samples[k];if(a&&a.length>1)return [k,sampStats(a)]}return null}
+function overdueTasks(){if(st.closed||!st.start)return [];const c=curDay();if(c===null)return [];const r=[];for(let k=st.trackFrom||0;k<c;k++)if(TASK.includes(D[k][4])&&!st.done[k])r.push(k);return r}
+function remindersFor(){
+ const out=[];if(st.closed||!st.start)return out;const c=curDay();if(c===null)return out;const tf=st.trackFrom||0;
+ const miss=k=>{const m=[];if(!num(st.feed[k]))m.push('ozuqa');if(!num(st.water[k]))m.push('suv');return m};
+ if(c>=tf&&new Date().getHours()>=REMIND_H){const m=miss(c);if(m.length)out.push('Bugun ('+c+'-kun) hali kiritilmagan: '+m.join(' va ')+'.')}
+ if(c>=1&&c-1>=tf){const m=miss(c-1);if(m.length)out.push('Kecha ('+(c-1)+'-kun) kiritilmagan: '+m.join(' va ')+'.')}
+ if(TASK.includes(D[c][4])&&!st.done[c])out.push('Bugun ('+c+'-kun): '+VET[D[c][4]]+'. Bajarilgach "Bugun" bo\'limida belgilang.');
+ return out}
+function densCalc(){
+ const area=num(st.area),mx=num(st.dmax)||33,al=alive(day);if(!area||al===null)return null;
+ const std=D.map(r=>r[0]),lw=lastW(day),r=lw?lw[1]/std[lw[0]]:1,est=std[day]*r,kgm=al*est/1000/area;
+ let hit=-1;for(let i=day;i<=N;i++)if(al*std[i]*r/1000/area>=mx){hit=i;break}
+ return {area,mx,al,kgm,per:al/area,hit,real:!!lw}}
 const kg=n=>n>=100?Math.round(n).toLocaleString('en').replace(/,/g,' '):n.toFixed(1);
 function verdict(v){return v<=-7?'Standartdan ancha past. Yem, suv va haroratni tekshiring.':v<=-3?'Biroz past. Ozuqa iste\'moli va suv bosimiga e\'tibor bering.':v>=7?'Standartdan yuqori. Bir xillikni (uniformity) tekshiring.':'Standart doirasida.'}
 function stdCum(i,d,only){let s=0;for(let k=0;k<=d;k++){if(only&&!num(only[k]))continue;const a=alive(k);if(a===null)return null;s+=D[k][i]*a/1000}return s}
@@ -349,9 +403,9 @@ const cnt=(o,d)=>{let n=0;for(let k=0;k<=d;k++)if(num(o[k]))n++;return n}
 const esc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const so=n=>Math.round(n).toLocaleString('en').replace(/,/g,' ');
 const dmy=v=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v||'');return m?m[3]+'.'+m[2]+'.'+m[1]:(v||'')};
-function finOf(f){let cost=0,feedC=0,rev=0,kgS=0;(f.costs||[]).forEach(x=>{const a=num(x.amount);cost+=a;if(x.cat===CATS[1])feedC+=a});(f.sales||[]).forEach(x=>{rev+=num(x.kg)*num(x.price);kgS+=num(x.kg)});return {cost,feedC,rev,kgS,profit:rev-cost}}
+function finOf(f){let cost=0,feedC=0,rev=0,kgS=0,birdsS=0,kgB=0;(f.costs||[]).forEach(x=>{const a=num(x.amount);cost+=a;if(x.cat===CATS[1])feedC+=a});(f.sales||[]).forEach(x=>{rev+=num(x.kg)*num(x.price);kgS+=num(x.kg);if(num(x.birds)){birdsS+=num(x.birds);kgB+=num(x.kg)}});return {cost,feedC,rev,kgS,birdsS,kgB,profit:rev-cost}}
 function stats(f){const b=+f.birds||0,dead=sumTo(f.mort,N),lw=lastW(N,f);let fcr=null;
- if(lw&&b){const aw=alive(lw[0],f),cf=sumTo(f.feed,lw[0]);if(cf>0&&aw>0&&cnt(f.feed,lw[0])===lw[0]+1)fcr=cf/(lw[1]*aw/1000)}
+ if(lw&&b){const aw=alive(lw[0],f),cf=sumTo(f.feed,lw[0]);if(cf>0&&aw>0&&cnt(f.feed,lw[0])===lw[0]+1)fcr=cf/(lw[1]*aw/1000+soldKgTo(f,lw[0]))}
  return {b,dead,lw,fcr,fin:finOf(f)}}
 function lastW(d,f=st){for(let k=d;k>=0;k--)if(num(f.log[k]))return [k,num(f.log[k])];return null}
 
@@ -395,8 +449,9 @@ function render(fill=true){
  $('#nextVac').textContent=nv===undefined?'Qolgan emlash yo\'q.':nv===day?'Bugun emlash kuni: '+VET[D[nv][4]]+'.':'Keyingi emlash: '+nv+'-kun ('+dateOf(nv)+(dateOf(nv)?', ':'')+(nv-day)+' kundan keyin) — '+VET[D[nv][4]]+'.';
  if(fill){$('#w').value=st.log[day]||'';$('#mort').value=st.mort[day]||'';$('#feed').value=st.feed[day]||'';$('#water').value=st.water[day]||'';$('#note').value=st.note[day]||'';$('#saved').textContent=''}
  renderRes();renderCmp();
- $('#alive').textContent=al!==null?'Tirik bosh: '+al+' (jami ulim: '+(+st.birds-al)+')':'Bosh sonini kiriting — ulim va poda jami hisoblanadi.';
- renderTable();renderFlock();renderChart();renderAdmin();renderFlockSel();renderMoney();renderPodalar();renderAlerts();renderForecast();renderPlan()}
+ $('#alive').textContent=al!==null?'Tirik bosh: '+al+' (jami ulim: '+sumTo(st.mort,day)+(soldTo(st,day)?', sotilgan: '+soldTo(st,day):'')+')':'Bosh sonini kiriting — ulim va poda jami hisoblanadi.';
+ $('#doneRow').hidden=!TASK.includes(r[4]);$('#done').checked=!!st.done[day];
+ renderTable();renderFlock();renderChart();renderAdmin();renderFlockSel();renderMoney();renderPodalar();renderAlerts();renderForecast();renderPlan();renderSamples();renderDens();renderRemind()}
 
 function renderRes(){
  const w=+$('#w').value,r=$('#res');
@@ -418,11 +473,13 @@ const mrow=(k,v,s)=>'<div class="m"><span class="k">'+k+'</span><div class="v"><
 function renderFlock(){
  const al=alive(day),b=+st.birds||0,rows=[];
  $('#flockDay').textContent=day+'-kun holati'+(dateOf(day)?' ('+dateOf(day)+')':'');
- const dead=al!==null?b-al:0;
- rows.push(mrow('Tirik bosh',al!==null?al:'—',al!==null?'jami ulim: '+dead+' ('+(dead/b*100).toFixed(1)+'%)':'Bosh sonini "Bugun" bo\'limida kiriting'));
+ const dead=sumTo(st.mort,day),sold=soldTo(st,day);
+ rows.push(mrow('Tirik bosh',al!==null?al:'—',al!==null?'jami ulim: '+dead+' ('+(dead/b*100).toFixed(1)+'%)'+(sold?' · sotilgan: '+sold:''):'Bosh sonini "Bugun" bo\'limida kiriting'));
  const lw=lastW(day);
  if(lw){const s=D[lw[0]][0];rows.push(mrow('Vazn (oxirgi kiritilgan)',lw[1]+'<i>g</i>',lw[0]+'-kun · standart '+s+' g ('+sign((lw[1]-s)/s*100)+')'))}
  else rows.push(mrow('Vazn (oxirgi kiritilgan)','—','Vaznni "Bugun" bo\'limida kiriting'));
+ const ls=lastSamp(day);
+ if(ls)rows.push(mrow('Bir xillik',ls[1].unif.toFixed(0)+'<i>%</i>',ls[0]+'-kun · '+ls[1].n+' namuna · CV '+ls[1].cv.toFixed(1)+'% · maqsad ≥80%'));
  [['Ozuqa jami (poda)',st.feed,1,'kg'],['Suv jami (poda)',st.water,2,'litr']].forEach(x=>{
   const fa=sumTo(x[1],day),fs=stdCum(x[2],day,x[1]),n=cnt(x[1],day);
   rows.push(mrow(x[0],fa?kg(fa)+'<i>'+x[3]+'</i>':'—',
@@ -431,12 +488,13 @@ function renderFlock(){
  if(lw&&al!==null){const wd=lw[0],aw=alive(wd),cf=sumTo(st.feed,wd),miss=wd+1-cnt(st.feed,wd);
   if(cf>0&&aw>0){
    if(miss>0)fs2='FCR uchun 0–'+wd+'-kun ozuqasi kerak, '+miss+' kun kiritilmagan.';
-   else{fv=(cf/(lw[1]*aw/1000)).toFixed(2);fs2=wd+'-kun bo\'yicha · standart '+(CUM[wd]/D[wd][0]).toFixed(2)}}}
+   else{fv=(cf/(lw[1]*aw/1000+soldKgTo(st,wd))).toFixed(2);fs2=wd+'-kun bo\'yicha · standart '+(CUM[wd]/D[wd][0]).toFixed(2)}}}
  rows.push(mrow('FCR (haqiqiy)',fv,fs2));
  $('#flockStat').innerHTML=rows.join('')}
 
 function renderTable(){
- $('#body').innerHTML=D.map((r,i)=>'<tr tabindex="0" data-d="'+i+'"'+(i===day?' class="sel"':'')+'><td>'+i+'</td><td>'+r[0]+'</td><td class="mine">'+(num(st.log[i])||'')+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+VET[r[4]]+'</td></tr>').join('')}
+ const od=new Set(overdueTasks());
+ $('#body').innerHTML=D.map((r,i)=>'<tr tabindex="0" data-d="'+i+'"'+(i===day?' class="sel"':'')+'><td>'+i+'</td><td>'+r[0]+'</td><td class="mine">'+(num(st.log[i])||'')+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+VET[r[4]]+(TASK.includes(r[4])?(st.done[i]?' ✓':od.has(i)?' ⚠':''):'')+'</td></tr>').join('')}
 
 function renderAdmin(){$('#bkInfo').textContent=store.backup?'Oxirgi zaxira nusxa: '+dmy(store.backup):'Zaxira nusxa hali saqlanmagan.'}
 function renderFlockSel(){
@@ -446,25 +504,28 @@ function renderFlockSel(){
 function renderMoney(){
  const f=finOf(st),b=+st.birds||0,rows=[];
  $('#moneyTitle').textContent='Natija — '+st.name;
+ { const sd=$('#sDay');if(document.activeElement!==sd&&sd.value===''){const c=curDay();sd.value=c!==null?c:day} }
  rows.push(mrow('Jami xarajat',f.cost?so(f.cost)+'<i>so\'m</i>':'—',f.cost?(f.feedC?'shundan yem: '+Math.round(f.feedC/f.cost*100)+'%':''):'Xarajatlarni pastda kiriting'));
- rows.push(mrow('Jami daromad',f.rev?so(f.rev)+'<i>so\'m</i>':'—',f.kgS?'sotilgan: '+kg(f.kgS)+' kg · o\'rtacha '+so(f.rev/f.kgS)+' so\'m/kg':'Sotuvni pastda kiriting'));
+ rows.push(mrow('Jami daromad',f.rev?so(f.rev)+'<i>so\'m</i>':'—',f.kgS?'sotilgan: '+kg(f.kgS)+' kg'+(f.birdsS?' ('+f.birdsS+' bosh, o\'rtacha '+Math.round(f.kgB*1000/f.birdsS)+' g)':'')+' · '+so(f.rev/f.kgS)+' so\'m/kg':'Sotuvni pastda kiriting'));
  const has=f.cost||f.rev;
  rows.push('<div class="m"><span class="k">Foyda</span><div class="v"><b'+(has?' style="color:'+(f.profit>=0?'var(--ok)':'var(--bad)')+'"':'')+'>'+(has?so(f.profit)+'<i>so\'m</i>':'—')+'</b>'+(has&&b?'<span>1 bosh hisobida: '+so(f.profit/b)+' so\'m</span>':'')+'</div></div>');
  let tv='—',ts='Xarajat va sotuv kiriting';
- if(f.cost&&f.kgS){tv=so(f.cost/f.kgS)+'<i>so\'m/kg</i>';ts='sotilgan go\'sht bo\'yicha'}
+ const partial=f.birdsS>0,lwE=lastW(N),aE=alive(N),remKg=(partial&&!st.closed&&lwE&&aE)?aE*lwE[1]/1000:0;
+ if(f.cost&&f.kgS&&remKg>0){tv='≈ '+so(f.cost/(f.kgS+remKg))+'<i>so\'m/kg</i>';ts='sotilgan + qolgan '+aE+' bosh tirik vazni ('+kg(remKg)+' kg) bo\'yicha, taxminiy'}
+ else if(f.cost&&f.kgS){tv=so(f.cost/f.kgS)+'<i>so\'m/kg</i>';ts='sotilgan go\'sht bo\'yicha'}
  else if(f.cost){const lw=lastW(N),aw=lw?alive(lw[0]):null;if(lw&&aw){const lk=aw*lw[1]/1000;tv='≈ '+so(f.cost/lk)+'<i>so\'m/kg</i>';ts='taxminiy: tirik vazn '+kg(lk)+' kg ('+lw[0]+'-kun) bo\'yicha'}}
  rows.push(mrow('1 kg tannarx',tv,ts));
  $('#moneyStat').innerHTML=rows.join('');
  const none='<p class="note">Hali yozuv yo\'q.</p>',del=(k,x)=>'<button class="ghost" data-del="'+k+'" data-id="'+esc(x.id)+'" aria-label="O\'chirish">×</button>';
  $('#costList').innerHTML=st.costs.length?st.costs.slice().reverse().map(x=>'<div class="li"><div class="t"><b>'+esc(x.cat)+' · '+so(num(x.amount))+' so\'m</b><span>'+dmy(x.date)+(x.note?' · '+esc(x.note):'')+'</span></div>'+del('c',x)+'</div>').join(''):none;
- $('#saleList').innerHTML=st.sales.length?st.sales.slice().reverse().map(x=>'<div class="li"><div class="t"><b>'+kg(num(x.kg))+' kg × '+so(num(x.price))+' = '+so(num(x.kg)*num(x.price))+' so\'m</b><span>'+dmy(x.date)+(x.note?' · '+esc(x.note):'')+'</span></div>'+del('s',x)+'</div>').join(''):none}
+ $('#saleList').innerHTML=st.sales.length?st.sales.slice().reverse().map(x=>'<div class="li"><div class="t"><b>'+kg(num(x.kg))+' kg × '+so(num(x.price))+' = '+so(num(x.kg)*num(x.price))+' so\'m</b><span>'+dmy(x.date)+(x.day!==''&&x.day!=null?' · '+x.day+'-kun':'')+(num(x.birds)?' · '+num(x.birds)+' bosh':'')+(x.note?' · '+esc(x.note):'')+'</span></div>'+del('s',x)+'</div>').join(''):none}
 function alertsFor(){
  const out=[],add=(lv,t)=>out.push({lv,t}),al=alive(day),b=+st.birds||0;
  const m=num(st.mort[day]);
  if(m&&al!==null){const pct=m/(al+m)*100;
   if(pct>=0.5)add('bad','Bugungi ulim: '+m+' bosh ('+pct.toFixed(2)+'%) — yuqori. Sababini aniqlang, kerak bo\'lsa veterinarga murojaat qiling.');
   else if(pct>=0.3)add('warn','Bugungi ulim: '+m+' bosh ('+pct.toFixed(2)+'%) — odatdagidan ko\'proq. Podani kuzatib turing.')}
- if(b&&al!==null){const cp=(b-al)/b*100;
+ if(b&&al!==null){const cp=sumTo(st.mort,day)/b*100;
   if(cp>=5)add('bad','Jami ulim '+cp.toFixed(1)+'% — yuqori. Sababini aniqlash kerak.');
   else if(cp>=3)add('warn','Jami ulim '+cp.toFixed(1)+'% — me\'yor chegarasiga yaqin.');
   else if(day<=7&&cp>=1.5)add('warn','Birinchi haftada jami ulim '+cp.toFixed(1)+'% — jo\'ja sifati, harorat va suvni tekshiring.')}
@@ -486,6 +547,16 @@ function alertsFor(){
   if(v<=-15)add('warn','Suv iste\'moli standartdan '+Math.abs(v).toFixed(0)+'% past ('+wr[0]+'-kun). Suv bosimi va idishlarni tekshiring.');
   else if(v>=15)add('warn','Suv iste\'moli standartdan '+v.toFixed(0)+'% ko\'p ('+wr[0]+'-kun). Issiqlik yoki kasallik belgisi bo\'lishi mumkin.')}
  for(let k=day;k<=Math.min(N,day+1);k++){if(VAC.includes(D[k][4]))add('info',(k===day?'Bugun':'Ertaga')+' ('+k+'-kun): '+VET[D[k][4]]+'.')}
+
+ const od=overdueTasks();
+ if(od.length)add('warn','Bajarilmagan emlash/davolash: '+od.slice(0,3).map(k=>k+'-kun '+VET[D[k][4]]).join(', ')+(od.length>3?' va yana '+(od.length-3)+' ta':'')+'. Bajargan bo\'lsangiz, "Bugun" bo\'limida belgilang.');
+ const us=lastSamp(day);
+ if(us&&day-us[0]<=7){const u=us[1].unif;
+  if(u<70)add('warn','Bir xillik (uniformity) '+u.toFixed(0)+'% ('+us[0]+'-kun) — past. Yem va suv joylari, zichlik va kasallikni tekshiring.');
+  else if(u<80)add('info','Bir xillik '+u.toFixed(0)+'% ('+us[0]+'-kun). Maqsad kamida 80%.')}
+ const dc=densCalc();
+ if(dc){if(dc.kgm>dc.mx)add('warn','Zichlik '+dc.kgm.toFixed(1)+' kg/m² — chegara ('+dc.mx+') dan oshdi. Qisman sotuvni rejalashtiring.');
+  else if(dc.hit>day&&dc.hit-day<=5)add('info','Zichlik chegarasiga ~'+(dc.hit-day)+' kundan keyin yetadi ('+dc.hit+'-kun). Qisman sotuv vaqtini rejalashtiring.')}
  const o={bad:0,warn:1,info:2};out.sort((a,b)=>o[a.lv]-o[b.lv]);return out}
 function renderAlerts(){
  const out=alertsFor(),hasData=Object.keys(st.log).length||Object.keys(st.mort).length||Object.keys(st.feed).length||Object.keys(st.water).length;
@@ -523,6 +594,20 @@ function renderPlan(){
  let note='Hisob '+al+' tirik bosh uchun (yana ulim bo\'lmaydi deb).';
  if(avg)note+=' Oxirgi '+rs.length+' kunda standartning '+(avg*100).toFixed(0)+'% ini berdingiz'+(p.adj?'; reja shu nisbat bilan hisoblandi.':'.');
  $('#planOut').innerHTML=rows.join('')+lines.join('')+'<p class="note">'+note+'</p>'}
+function renderRemind(){
+ const r=remindersFor();$('#remind').hidden=!r.length;
+ $('#remindList').innerHTML=r.map(x=>'<div class="al info">'+esc(x)+'</div>').join('');
+ const c=curDay();$('#goTodayRow').hidden=!(r.length&&c!==null&&c!==day)}
+function renderSamples(){
+ const a=st.samples[day]||[],q=a.length?sampStats(a):null;
+ $('#smpOut').innerHTML=q?(mrow('Namuna',q.n+'<i>tovuq</i>',Math.round(q.min)+'–'+Math.round(q.max)+' g oralig\'ida')+mrow('O\'rtacha vazn',Math.round(q.m)+'<i>g</i>','haqiqiy vazn sifatida saqlandi')+(q.n>1?mrow('Bir xillik',q.unif.toFixed(0)+'<i>%</i>','o\'rtachadan ±10% ichidagilar · maqsad ≥80%')+mrow('CV',q.cv.toFixed(1)+'<i>%</i>','kam bo\'lsa yaxshi (≤10%)'):'')+'<p class="note">Oxirgi kiritilganlar: '+a.slice(-12).join(', ')+'</p>'):'<p class="note">Bu kun uchun namuna yo\'q.</p>';
+ $('#smpUndo').disabled=$('#smpClear').disabled=!a.length}
+function renderDens(){
+ [['#area',st.area||''],['#dmax',st.dmax||'']].forEach(x=>{if(document.activeElement!==$(x[0]))$(x[0]).value=x[1]});
+ const d=densCalc();
+ if(!d){$('#densOut').innerHTML='<p class="note">'+(num(st.area)?'Bosh sonini "Bugun" bo\'limida kiriting.':'Xona maydonini kiriting — zichlik hisoblanadi.')+'</p>';return}
+ $('#densOut').innerHTML=mrow('Bosh / m²',d.per.toFixed(1),'tirik bosh: '+d.al)+mrow('Tirik vazn / m²',d.kgm.toFixed(1)+'<i>kg/m²</i>','chegara '+d.mx+' kg/m² ('+Math.round(d.kgm/d.mx*100)+'%) · '+(d.real?'haqiqiy vazn asosida':'standart vazn asosida'))
+  +mrow('Chegaraga yetadi',d.hit<0?'—':d.hit+'<i>-kun</i>',d.hit<0?N+'-kungacha chegaraga yetmaydi':d.hit===day?'chegaraga yetgan':(dateOf(d.hit)?dateOf(d.hit)+' · ':'')+(d.hit-day)+' kundan keyin')}
 function renderPodalar(){
  const nm=$('#flockName');if(document.activeElement!==nm)nm.value=st.name;
  const btn=(a,t,c)=>'<button'+(c?' class="'+c+'"':'')+' data-act="'+a+'">'+t+'</button>';
@@ -531,6 +616,7 @@ function renderPodalar(){
   parts.push(q.b?q.b+' bosh':'bosh soni kiritilmagan');
   if(f.start)parts.push(dmy(f.start)+(f.closed?' – '+dmy(f.closed):''));
   if(q.b)parts.push('ulim '+(q.dead/q.b*100).toFixed(1)+'%');
+  if(q.fin.birdsS)parts.push('sotilgan '+q.fin.birdsS+' bosh');
   if(q.lw)parts.push('vazn '+q.lw[1]+' g ('+q.lw[0]+'-kun)');
   if(q.fcr)parts.push('FCR '+q.fcr.toFixed(2));
   if(q.fin.cost||q.fin.rev)parts.push('foyda '+so(q.fin.profit)+' so\'m');
@@ -587,6 +673,18 @@ $('#xl').addEventListener('click',async()=>{
  try{msg.textContent='Tayyor: '+await downloadReport()}
  catch(e){msg.textContent=e&&e.code==='declined'?'Yuklash bekor qilindi.':'Xatolik: fayl yaratilmadi. Sahifani yangilab qayta urinib ko\'ring.'}});
 
+/* ---- Namuna, emlash belgisi, zichlik, eslatma ---- */
+function afterSamples(){const a=st.samples[day]||[];if(a.length)st.log[day]=Math.round(sampStats(a).m);save();$('#w').value=st.log[day]||'';render(false)}
+function addSample(){const v=+$('#smp').value;if(!(v>0&&v<10000))return;(st.samples[day]=st.samples[day]||[]).push(v);$('#smp').value='';afterSamples();$('#smp').focus()}
+$('#smpAdd').addEventListener('click',addSample);
+$('#smp').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addSample()}});
+$('#smpUndo').addEventListener('click',()=>{const a=st.samples[day];if(!a||!a.length)return;a.pop();if(!a.length)delete st.samples[day];afterSamples()});
+$('#smpClear').addEventListener('click',async()=>{if(!(st.samples[day]||[]).length)return;if(!await ask('Shu kunning barcha namunalari ('+st.samples[day].length+' ta) o\'chiriladi. Saqlangan o\'rtacha vazn o\'zgarmaydi.','Tozalash'))return;delete st.samples[day];afterSamples()});
+$('#done').addEventListener('change',e=>{if(e.target.checked)st.done[day]=true;else delete st.done[day];save();render(false)});
+$('#area').addEventListener('input',e=>{const v=+e.target.value;st.area=v>0?v:'';save();renderDens();renderAlerts()});
+$('#dmax').addEventListener('input',e=>{const v=+e.target.value;st.dmax=v>0?v:'';save();renderDens();renderAlerts()});
+$('#goToday').addEventListener('click',()=>{const c=curDay();if(c!==null)setDay(c)});
+
 /* ---- Prognoz va yem rejasi sozlamalari ---- */
 $('#target').addEventListener('input',e=>{const v=Math.round(+e.target.value);st.plan.target=v>0?v:'';save();renderForecast()});
 $('#pPrice').addEventListener('input',e=>{const v=Math.round(+e.target.value);st.plan.price=v>0?v:'';save();renderPlan()});
@@ -630,9 +728,14 @@ $('#addCost').addEventListener('click',()=>{
  $('#cAmt').value='';$('#cNote').value='';save();render(false);$('#cMsg').textContent='Qo\'shildi ✓'});
 $('#addSale').addEventListener('click',()=>{
  const k=+$('#sKg').value,p=Math.round(+$('#sPrice').value),m=$('#sMsg');
+ const bd=Math.round(+$('#sBirds').value)||0,sd=$('#sDay').value===''?null:Math.round(+$('#sDay').value);
  if(!(k>0&&p>0)){m.textContent='Kg va narxni kiriting.';return}
- st.sales.push({id:uid(),kg:k,price:p,note:$('#sNote').value.trim().slice(0,100),date:stamp()});
- $('#sKg').value='';$('#sPrice').value='';$('#sNote').value='';save();render(false);$('#sMsg').textContent='Qo\'shildi ✓'});
+ if(sd!==null&&(sd<0||sd>N)){m.textContent='Kun 0–'+N+' oralig\'ida bo\'lishi kerak.';return}
+ if(bd>0){
+  if(sd===null){m.textContent='Sotilgan bosh uchun kunni kiriting.';return}
+  const a=alive(sd);if(a!==null&&bd>a){m.textContent='Shu kunda tirik bosh '+a+' ta, undan ko\'p sota olmaysiz.';return}}
+ st.sales.push({id:uid(),kg:k,price:p,birds:bd>0?bd:'',day:sd===null?'':sd,note:$('#sNote').value.trim().slice(0,100),date:stamp()});
+ $('#sKg').value='';$('#sPrice').value='';$('#sBirds').value='';$('#sDay').value='';$('#sNote').value='';save();render(false);$('#sMsg').textContent='Qo\'shildi ✓'});
 $('#tab-money').addEventListener('click',async e=>{
  const b=e.target.closest('button[data-del]');if(!b)return;
  const k=b.dataset.del==='c'?'costs':'sales',id=b.dataset.id;
@@ -657,10 +760,14 @@ function cleanFlock(d){
  if(typeof d.id==='string'&&d.id)f.id=d.id.slice(0,30);
  f.start=isoOk(d.start);f.birds=+d.birds>0?String(Math.round(+d.birds)):'';
  f.mort=cleanMap(d.mort);f.log=cleanMap(d.log);f.feed=cleanMap(d.feed);f.water=cleanMap(d.water);f.note=cleanMap(d.note,true);f.closed=isoOk(d.closed);
+ f.samples={};if(d.samples&&typeof d.samples==='object')for(const k in d.samples){const dd=+k;if(Number.isInteger(dd)&&dd>=0&&dd<=N&&Array.isArray(d.samples[k])){const a=d.samples[k].map(Number).filter(v=>v>0&&v<10000).slice(0,300);if(a.length)f.samples[dd]=a}}
+ f.done={};if(d.done&&typeof d.done==='object')for(const k in d.done){const dd=+k;if(Number.isInteger(dd)&&dd>=0&&dd<=N&&d.done[k])f.done[dd]=true}
+ f.area=+d.area>0?+d.area:'';f.dmax=+d.dmax>0?+d.dmax:33;
+ f.trackFrom=(Number.isInteger(d.trackFrom)&&d.trackFrom>=0&&d.trackFrom<=N)?d.trackFrom:initTrack(f);
  const pl=d.plan&&typeof d.plan==='object'?d.plan:{};f.plan={target:(+pl.target>=300&&+pl.target<=6000)?Math.round(+pl.target):2000,price:+pl.price>0?Math.round(+pl.price):'',bag:+pl.bag>0&&+pl.bag<=1000?+pl.bag:50,adj:pl.adj===true};
  const arr=x=>Array.isArray(x)?x.slice(0,500).filter(y=>y&&typeof y==='object'):[];
  f.costs=arr(d.costs).map(x=>({id:uid(),cat:String(x.cat||'Boshqa').slice(0,40),amount:Math.round(num(x.amount)),note:String(x.note||'').slice(0,100),date:isoOk(x.date)})).filter(x=>x.amount>0);
- f.sales=arr(d.sales).map(x=>({id:uid(),kg:num(x.kg),price:Math.round(num(x.price)),note:String(x.note||'').slice(0,100),date:isoOk(x.date)})).filter(x=>x.kg>0&&x.price>0);
+ f.sales=arr(d.sales).map(x=>({id:uid(),kg:num(x.kg),price:Math.round(num(x.price)),birds:Math.round(num(x.birds))||'',day:(x.day===''||x.day==null)?'':(Number.isInteger(+x.day)&&+x.day>=0&&+x.day<=N?+x.day:''),note:String(x.note||'').slice(0,100),date:isoOk(x.date)})).filter(x=>x.kg>0&&x.price>0);
  return f}
 $('#bkFile').addEventListener('change',async e=>{
  const f=e.target.files&&e.target.files[0],msg=$('#bkMsg');e.target.value='';
