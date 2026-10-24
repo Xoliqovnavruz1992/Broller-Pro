@@ -1,4 +1,4 @@
-const V = 'ross308-v7';
+const V = 'brollerpro-v9';
 const SHELL = ['./', 'index.html', 'xlsx.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'];
 
 self.addEventListener('install', e => {

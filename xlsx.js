@@ -1,4 +1,4 @@
-/* Ross 308 — Excel (.xlsx) hisobot yaratuvchi. Tashqi kutubxonasiz, offline ishlaydi. */
+/* Broller Pro — Excel (.xlsx) hisobot yaratuvchi. Tashqi kutubxonasiz, offline ishlaydi. */
 (function (root) {
   'use strict';
 
@@ -154,7 +154,7 @@
     var needs = 'OR(B3="",B4="")';
     var aliveNow = (birds && cur !== '') ? Math.max(birds - soldAt(cur) - (function () { var s = 0; for (var k = 0; k <= cur; k++) s += +mort[k] > 0 ? +mort[k] : 0; return s; })(), 0) : '';
     var S = [];
-    S.push(row(1, [cs('A1', 11, 'Ross 308 — hisobot' + (st.name ? ' — ' + st.name : ''))]));
+    S.push(row(1, [cs('A1', 11, 'Broller Pro — hisobot' + (st.name ? ' — ' + st.name : ''))]));
     S.push(row(2, [cs('A2', 10, 'Joylashtirilgan sana'), serial === null ? cb('B2', 9) : cn('B2', 9, serial)]));
     S.push(row(3, [cs('A3', 10, 'Bosh soni'), birds ? cn('B3', 8, birds) : cb('B3', 8)]));
     S.push(row(4, [cs('A4', 10, 'Bugungi kun (0–' + N + ')'), cf('B4', 2, 'IF(B2="","",MIN(' + N + ',MAX(0,TODAY()-B2)))', cur)]));
